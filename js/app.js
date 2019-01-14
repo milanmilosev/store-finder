@@ -19,7 +19,9 @@ var mapResultsContainer  = document.getElementById('map'),
     listResultsContainer = document.getElementById('mapList'),
     noResultsSuggestion  = document.getElementById('noResults'),
     showAvailableCities  = document.getElementById('showAvailableCities'),
-    spinner              = document.getElementsByClassName('spinner')[0];
+    spinner              = document.getElementsByClassName('spinner')[0],
+    mapResultsButton     = document.getElementById('showMapResults'), 
+    listResultsButton    = document.getElementById('showListResults');
 
     
 // mobile check
@@ -32,7 +34,7 @@ window.mobilecheck = function () {
 };
 
 // fetch data
-function initLocationList() {
+initLocationList = () => {
     fetch(jsonURL)
         .then( response => response.json())
         .then( data => sortLocationList(data))
@@ -42,7 +44,7 @@ function initLocationList() {
 }
 
 // map initialization
-function initMap() {
+initMap = () => {
   map = new google.maps.Map(mapResultsContainer, {
       zoom: 12,
       center: initLatLng,
@@ -167,7 +169,7 @@ var assignListener = function (markerObj, infoWindowObj) {
 };
 
 // iterate through json \\ create allmarkers global array
-function sortLocationList(data) {
+sortLocationList = (data) => {
     bounds = new google.maps.LatLngBounds();
     for (var farm in data.farms) {
         if (data.farms[farm].coordinates) {
@@ -184,10 +186,15 @@ function sortLocationList(data) {
                     country: data.farms[farm]['country'],
                     icon: 'https://infarm.com/wp-content/themes/infarm-child/images/map-marker-alt-75.svg'
                 });
+
+                // regex - format farm name ex: "HAN [Edeka]" => Edeka
+                var farmName = `${data.farms[farm]['organization']}`;
+                '[' == farmName.substr(4, 1) && (farmName = farmName.substr(5), farmName = farmName.substr(0, farmName.length - 1));
+                // -- //
                 var dataForInfoWindow = `
                         <span class="map-infopanel">
                             <strong>${data.farms[farm]['category']}</strong>
-                            <h4>${data.farms[farm]['farm_name']}</h4>
+                            <h4>${farmName}</h4>
                             <p>${data.farms[farm]['line_1']} <br>
                             ${data.farms[farm]['postcode']}, 
                             ${data.farms[farm]['city']},
@@ -211,12 +218,10 @@ function sortLocationList(data) {
 }
 
 // Shows any markers currently in the array.
-function setBoundsNow() {
-    setBounds(map);
-}
+setBoundsNow = () => setBounds(map);
 
 // Sets the map on all markers in the array.
-function setMapOnAll(map) {
+setMapOnAll = (map) => {
     for (var i = 0; i < allmarkers.length; i++) {
         allmarkers[i].setMap(map);
         // showNumberOfResults();
@@ -224,20 +229,13 @@ function setMapOnAll(map) {
 }
 
 // Removes the markers from the map, but keeps them in the array.
-function clearMarkers() {
-    setMapOnAll(null);
-}
+clearMarkers  = () => setMapOnAll(null);
 
 // Shows any markers currently in the array.
-function showMarkers() {
-    setMapOnAll(map);
-}
+showMarkers   = () =>  setMapOnAll(map);
 
 // Deletes all markers in the array by removing references to them.
-function deleteMarkers() {
-    clearMarkers();
-    markers = [];
-}
+deleteMarkers = () => clearMarkers(); markers = [];
 
 // ####
 // call google maps on window load
@@ -293,9 +291,7 @@ var pac_input = document.getElementById('location-input');
     if (input.addEventListener) input.addEventListener = addEventListenerWrapper;else if (input.attachEvent) input.attachEvent = addEventListenerWrapper;
 })(pac_input);
 
-function checkVariable() {
-    autocomplete.getPlace() ? runAutocomplete() : setTimeout(checkVariable, 25)
-}
+checkVariable = () =>  autocomplete.getPlace() ? runAutocomplete() : setTimeout(checkVariable, 25);
 
 function runAutocomplete() {
     // prevent submit if the input is empty
@@ -314,7 +310,6 @@ function runAutocomplete() {
 
 // Geolocation
 function getMyLocation(e) {
-    // e.preventDefault();
     e.preventDefault();
     // add active class for loader
     document.getElementById('location-getMylocation').classList.add('active');
@@ -367,7 +362,7 @@ function updateMap(lat, lng) {
 }
 
 // change place on map // all // stores // restaurants
-changePlace = function (value, optionIndex) {
+changePlace = function(value, optionIndex) {
     if (optionIndex != null) {
         var option = document.getElementById('sel').options[optionIndex];
         option.selected = true;
@@ -459,7 +454,7 @@ function showNumberOfResults(value) {
 }
 
 // no results -- show available cities
-function showNoResultsMsg(count) {
+showNoResultsMsg = (count) => {
     // remove previous list results
     listResultsContainer.innerHTML = '';
     // remove previous results
@@ -478,7 +473,7 @@ function showNoResultsMsg(count) {
     }
 }
 
-function showSuggestedCity(cityName) {
+showSuggestedCity = (cityName) => {
     // get city name
     var chosenCity = cityName;
     // get city coordinates
@@ -515,16 +510,26 @@ function showSuggestedCity(cityName) {
     });
 }
 
-function showListResults() {
-    mapResultsContainer.style.display = 'none', mapResultsContainer.classList.remove('active'), listResultsContainer.style.display = 'block', listResultsContainer.classList.add('active'), listResultsButton.classList.add('active'), mapResultsButton.classList.remove('active')
+showListResults = () =>  {
+    mapResultsContainer.style.display = 'none', 
+    mapResultsContainer.classList.remove('active'), 
+    listResultsContainer.style.display = 'block', 
+    listResultsContainer.classList.add('active'), 
+    listResultsButton.classList.add('active'), 
+    mapResultsButton.classList.remove('active');
 }
 
-function showMapResults() {
-    listResultsContainer.style.display = 'none', listResultsContainer.classList.remove('active'), mapResultsContainer.style.display = 'block', mapResultsContainer.classList.add('active'), mapResultsButton.classList.add('active'), listResultsButton.classList.remove('active')
+showMapResults = () => {
+    listResultsContainer.style.display = 'none', 
+    listResultsContainer.classList.remove('active'), 
+    mapResultsContainer.style.display = 'block', 
+    mapResultsContainer.classList.add('active'), 
+    mapResultsButton.classList.add('active'), 
+    listResultsButton.classList.remove('active');
 }
 
 // Direction
-function showMeDirection(cords) {
+showMeDirection = (cords) => {
     var c = cords.getAttribute('data-coordinates').replace(/[(\)]/g, '');
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${c}`);
 }
